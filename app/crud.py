@@ -49,10 +49,14 @@ def get_employees(
 
 
 def get_employee(db: Session, employee_id: int):
-    return db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    return (db.query(models.Employee)
+            .filter(models.Employee.id == employee_id).first())
 
 
-def create_employee(db: Session, employee: schemas.EmployeeCreate, photo_path: str = None):
+def create_employee(db: Session,
+                    employee: schemas.EmployeeCreate,
+                    photo_path: str = None
+                    ):
     db_employee = models.Employee(
         **employee.model_dump(),
         photo_path=photo_path
@@ -63,7 +67,11 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate, photo_path: s
     return db_employee
 
 
-def update_employee(db: Session, employee_id: int, employee: schemas.EmployeeUpdate, photo_path: str = None):
+def update_employee(db: Session,
+                    employee_id: int,
+                    employee: schemas.EmployeeUpdate,
+                    photo_path: str = None
+                    ):
     db_employee = get_employee(db, employee_id)
 
     if db_employee:

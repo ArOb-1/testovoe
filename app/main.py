@@ -5,7 +5,6 @@ from datetime import datetime
 from app.database import engine
 from app import models
 from app.routers import html_router, api_router
-from app.config import config
 
 
 models.Base.metadata.create_all(bind=engine)

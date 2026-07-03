@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Request, Depends, Form, UploadFile, File, HTTPException, Query
+from fastapi import (APIRouter, Request, Depends,
+                     Form, UploadFile, File, HTTPException, Query)
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
-import os
 
 from app.database import get_db
 from app import crud, schemas
@@ -177,7 +176,9 @@ async def edit_employee(
         employee = crud.get_employee(db, employee_id)
         return templates.TemplateResponse(
             "edit.html",
-            {"request": request, "employee": employee, "error": f"Ошибка: {str(e)}"}
+            {"request": request,
+             "employee": employee,
+             "error": f"Ошибка: {str(e)}"}
         )
 
 

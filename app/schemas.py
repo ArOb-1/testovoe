@@ -1,8 +1,8 @@
 from pydantic import BaseModel, field_validator
-from datetime import datetime, date
+from datetime import date
 from typing import Optional
 
-from app.utils import validate_phone, validate_gender, validate_birth_date
+from app.utils import validate_phone, validate_gender, parse_date
 
 
 class EmployeeBase(BaseModel):
@@ -62,7 +62,7 @@ class EmployeeCreateForm(BaseModel):
     @classmethod
     def validate_birth_date(cls, v: str) -> date:
         """Проверка даты рождения"""
-        return validate_birth_date(v)
+        return parse_date(v)
 
     def to_employee_create(self) -> EmployeeCreate:
         """Конвертирует в модель для создания"""

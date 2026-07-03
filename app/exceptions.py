@@ -21,7 +21,8 @@ class NotFoundError(AppError):
 class ValidationError(AppError):
     """422 - Ошибка валидации"""
     def __init__(self, message: str):
-        super().__init__(message, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        super().__init__(message,
+                         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 class FileTooLargeError(AppError):
@@ -30,4 +31,13 @@ class FileTooLargeError(AppError):
         super().__init__(
             f"Размер файла не должен превышать {max_size // 1024} КБ",
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+        )
+
+
+class EmployeeAlreadyExistsError(AppError):
+    """409 - Сотрудник уже существует"""
+    def __init__(self, phone: str):
+        super().__init__(
+            message=f"Сотрудник с телефоном {phone} уже существует",
+            status_code=status.HTTP_409_CONFLICT
         )

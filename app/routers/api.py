@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
 
 from app import crud, schemas, models
 from app.database import get_db
@@ -21,12 +20,18 @@ router = APIRouter(prefix="/api", tags=["api"])
 )
 async def get_employees(
     db: Session = Depends(get_db),
-    skip: int = Query(0, ge=0, description="Количество пропущенных записей"),
-    limit: int = Query(10, ge=1, le=100, description="Количество записей на странице"),
-    search: Optional[str] = Query(None, description="Поиск по ФИО или телефону"),
-    gender: Optional[str] = Query(None, description="Фильтр по полу (Муж/Жен)"),
-    age_from: Optional[str] = Query(None, description="Минимальный возраст"),
-    age_to: Optional[str] = Query(None, description="Максимальный возраст")
+    skip: int = Query(0, ge=0,
+                      description="Количество пропущенных записей"),
+    limit: int = Query(10, ge=1, le=100,
+                       description="Количество записей на странице"),
+    search: Optional[str] = Query(None,
+                                  description="Поиск по ФИО или телефону"),
+    gender: Optional[str] = Query(None,
+                                  description="Фильтр по полу (Муж/Жен)"),
+    age_from: Optional[str] = Query(None,
+                                    description="Минимальный возраст"),
+    age_to: Optional[str] = Query(None,
+                                  description="Максимальный возраст")
 ):
     """
     Получить список сотрудников с фильтрацией и пагинацией.
