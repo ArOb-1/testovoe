@@ -245,15 +245,11 @@
                         Удалить сотрудника
                     </button>
                 </div>
-
-                <!-- Примечание -->
                 <p class="text-xs text-gray-400 text-center">
-                    <span class="text-red-500">*</span> - обязательные поля
+                    <span class="text-red-500">*</span>
                 </p>
             </div>
         </form>
-
-        <!-- Информация о сотруднике -->
         <div class="mt-6 bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
             <div class="grid grid-cols-2 gap-2">
                 <div><span class="font-medium">ID:</span> {{ employee.id }}</div>
@@ -283,25 +279,18 @@
                 form.submit();
             }
         }
-
-        // Валидация телефона при вводе
         document.getElementById('phone').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9+]/g, '');
             if (!this.value.startsWith('+7') && this.value) {
-                // Если пользователь начал вводить без +7, добавляем
                 if (this.value.length > 0 && !this.value.startsWith('+7')) {
                     this.value = '+7' + this.value.replace(/[^0-9]/g, '');
                 }
             }
-            // Ограничиваем длину
             if (this.value.length > 12) {
                 this.value = this.value.slice(0, 12);
             }
         });
-
-        // Валидация даты при вводе
         document.getElementById('birth_date').addEventListener('input', function(e) {
-            // Автоматически добавляем точки
             let value = this.value.replace(/[^0-9]/g, '');
             if (value.length >= 2 && value.length < 5) {
                 value = value.slice(0, 2) + '.' + value.slice(2);
@@ -310,8 +299,6 @@
             }
             this.value = value;
         });
-
-        // Превью фото перед загрузкой
         document.getElementById('photo').addEventListener('change', function(e) {
             const file = this.files[0];
             if (file) {
@@ -353,8 +340,6 @@
                 }
             }
         });
-
-        // Предупреждение при уходе со страницы с несохраненными изменениями
         let formChanged = false;
         document.querySelector('form').addEventListener('input', function() {
             formChanged = true;

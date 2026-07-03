@@ -76,8 +76,6 @@
                 </div>
             </form>
         </div>
-
-        <!-- Таблица -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -94,7 +92,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for employee in employees %}
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ employee.id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ loop.index }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             {% if employee.photo_path %}
                             <img src="{{ employee.photo_path }}" alt="Фото" class="employee-photo">
