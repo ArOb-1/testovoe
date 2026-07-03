@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование сотрудника</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .form-input {
+            @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm 
+                   focus:border-blue-500 focus:ring-blue-500;
+        }
+        .form-input:disabled {
+            @apply bg-gray-100 cursor-not-allowed;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .form-error {
+            @apply text-red-600 text-sm mt-1;
+        }
+        .form-radio {
+            @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300;
+        }
+        .btn-primary {
+            @apply bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 
+                   transition-colors duration-200;
+        }
+        .btn-danger {
+            @apply bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 
+                   transition-colors duration-200;
+        }
+        .btn-secondary {
+            @apply bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 
+                   transition-colors duration-200;
+        }
+        .photo-preview {
+            @apply w-32 h-32 object-cover rounded-lg border-2 border-gray-200;
+        }
+        .gender-male {
+            background-color: #93c5fd;
+            color: #1e3a8a;
+        }
+        .gender-female {
+            background-color: #f9a8d4;
+            color: #831843;
+        }
+        .gender-badge {
+            @apply px-3 py-1 rounded-full text-sm font-medium inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">
+                Редактирование сотрудника
+            </h1>
+            <a href="/" class="text-blue-600 hover:text-blue-800 hover:underline">
+                ← Назад к списку
+            </a>
+        </div>
+        {% if error %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm" role="alert">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">{{ error }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/edit/{{ employee.id }}" enctype="multipart/form-data" 
+              class="bg-white rounded-lg shadow-lg p-6">
+            
+            <div class="space-y-6">
+                <div>
+                    <label for="last_name" class="form-label">
+                        Фамилия <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="last_name" 
+                           name="last_name" 
+                           required
+                           value="{{ employee.last_name }}"
+                           class="form-input"
+                           placeholder="Введите фамилию">
+                </div>
+                <div>
+                    <label for="first_name" class="form-label">
+                        Имя <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="first_name" 
+                           name="first_name" 
+                           required
+                           value="{{ employee.first_name }}"
+                           class="form-input"
+                           placeholder="Введите имя">
+                </div>
+                <div>
+                    <label for="patronymic" class="form-label">
+                        Отчество
+                    </label>
+                    <input type="text" 
+                           id="patronymic" 
+                           name="patronymic" 
+                           value="{{ employee.patronymic or '' }}"
+                           class="form-input"
+                           placeholder="Введите отчество (необязательно)">
+                </div>
+                <div>
+                    <label for="phone" class="form-label">
+                        Телефон <span class="text-red-500">*</span>
+                    </label>
+                    <input type="tel" 
+                           id="phone" 
+                           name="phone" 
+                           required
+                           value="{{ employee.phone }}"
+                           class="form-input"
+                           placeholder="+7XXXXXXXXXX"
+                           pattern="\+7\d{10}">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Формат: +7XXXXXXXXXX (10 цифр после +7)
+                    </p>
+                </div>
+                <div>
+                    <label for="birth_date" class="form-label">
+                        Дата рождения <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="birth_date" 
+                           name="birth_date" 
+                           required
+                           value="{{ employee.birth_date.strftime('%d.%m.%Y') }}"
+                           class="form-input"
+                           placeholder="ДД.ММ.ГГГГ">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Формат: ДД.ММ.ГГГГ (например, 31.12.1990)
+                    </p>
+                </div>
+                <div>
+                    <span class="form-label">
+                        Пол <span class="text-red-500">*</span>
+                    </span>
+                    <div class="mt-2 flex gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" 
+                                   name="gender" 
+                                   value="Муж" 
+                                   required
+                                   {% if employee.gender == 'Муж' %}checked{% endif %}
+                                   class="form-radio">
+                            <span class="ml-2">Муж</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" 
+                                   name="gender" 
+                                   value="Жен" 
+                                   required
+                                   {% if employee.gender == 'Жен' %}checked{% endif %}
+                                   class="form-radio">
+                            <span class="ml-2">Жен</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">
+                        Фото
+                    </label>
+                    {% if employee.photo_path %}
+                    <div class="mt-2 flex items-center gap-4">
+                        <img src="{{ employee.photo_path }}" 
+                             alt="Фото сотрудника" 
+                             class="photo-preview">
+                        <div class="flex flex-col gap-2">
+                            <span class="text-sm text-gray-600">Текущее фото</span>
+                            <label class="inline-flex items-center cursor-pointer text-sm text-red-600 hover:text-red-800">
+                                <input type="checkbox" 
+                                       name="delete_photo" 
+                                       value="on"
+                                       class="form-checkbox h-4 w-4 text-red-600">
+                                <span class="ml-2">Удалить фото</span>
+                            </label>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-2 flex items-center gap-4">
+                        <div class="w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 
+                                    flex items-center justify-center text-gray-400 text-sm">
+                            Нет фото
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <label for="photo" class="block text-sm text-gray-600 mb-1">
+                            Загрузить новое фото
+                        </label>
+                        <input type="file" 
+                               id="photo" 
+                               name="photo" 
+                               accept="image/*"
+                               class="block w-full text-sm text-gray-500
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-md file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-blue-50 file:text-blue-700
+                                      hover:file:bg-blue-100
+                                      cursor-pointer">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Максимальный размер: 200 КБ. Поддерживаются: JPG, PNG, GIF, WebP
+                        </p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-4 pt-6 border-t border-gray-200">
+                    <button type="submit" class="btn-primary">
+                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                        </svg>
+                        Сохранить изменения
+                    </button>
+                    
+                    <a href="/" class="btn-secondary">
+                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Отмена
+                    </a>
+
+                    <button type="button" 
+                            onclick="confirmDelete({{ employee.id }})"
+                            class="btn-danger ml-auto">
+                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Удалить сотрудника
+                    </button>
+                </div>
+
+                <!-- Примечание -->
+                <p class="text-xs text-gray-400 text-center">
+                    <span class="text-red-500">*</span> - обязательные поля
+                </p>
+            </div>
+        </form>
+
+        <!-- Информация о сотруднике -->
+        <div class="mt-6 bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+            <div class="grid grid-cols-2 gap-2">
+                <div><span class="font-medium">ID:</span> {{ employee.id }}</div>
+                <div><span class="font-medium">Возраст:</span> 
+                    {% if employee.age %}
+                        {{ employee.age }} лет
+                    {% else %}
+                        {{ employee.age }} лет
+                    {% endif %}
+                </div>
+                <div><span class="font-medium">Дата создания:</span> 
+                    {{ employee.created_at.strftime('%d.%m.%Y %H:%M') if employee.created_at else '—' }}
+                </div>
+                <div><span class="font-medium">Последнее обновление:</span> 
+                    {{ employee.updated_at.strftime('%d.%m.%Y %H:%M') if employee.updated_at else '—' }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function confirmDelete(id) {
+            if (confirm('Вы уверены, что хотите удалить этого сотрудника?\nЭто действие нельзя отменить!')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/delete/${id}`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Валидация телефона при вводе
+        document.getElementById('phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9+]/g, '');
+            if (!this.value.startsWith('+7') && this.value) {
+                // Если пользователь начал вводить без +7, добавляем
+                if (this.value.length > 0 && !this.value.startsWith('+7')) {
+                    this.value = '+7' + this.value.replace(/[^0-9]/g, '');
+                }
+            }
+            // Ограничиваем длину
+            if (this.value.length > 12) {
+                this.value = this.value.slice(0, 12);
+            }
+        });
+
+        // Валидация даты при вводе
+        document.getElementById('birth_date').addEventListener('input', function(e) {
+            // Автоматически добавляем точки
+            let value = this.value.replace(/[^0-9]/g, '');
+            if (value.length >= 2 && value.length < 5) {
+                value = value.slice(0, 2) + '.' + value.slice(2);
+            } else if (value.length >= 4) {
+                value = value.slice(0, 2) + '.' + value.slice(2, 4) + '.' + value.slice(4, 8);
+            }
+            this.value = value;
+        });
+
+        // Превью фото перед загрузкой
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (file) {
+                if (file.size > 200 * 1024) {
+                    alert('Размер файла не должен превышать 200 КБ');
+                    this.value = '';
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Файл должен быть изображением');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.querySelector('.photo-preview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.querySelector('input[name="delete_photo"]')?.addEventListener('change', function(e) {
+            if (this.checked) {
+                const preview = document.querySelector('.photo-preview');
+                if (preview) {
+                    preview.style.opacity = '0.5';
+                    preview.style.filter = 'grayscale(1)';
+                }
+            } else {
+                const preview = document.querySelector('.photo-preview');
+                if (preview) {
+                    preview.style.opacity = '1';
+                    preview.style.filter = 'grayscale(0)';
+                }
+            }
+        });
+
+        // Предупреждение при уходе со страницы с несохраненными изменениями
+        let formChanged = false;
+        document.querySelector('form').addEventListener('input', function() {
+            formChanged = true;
+        });
+        document.querySelector('form').addEventListener('change', function() {
+            formChanged = true;
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?';
+            }
+        });
+
+        document.querySelector('form').addEventListener('submit', function() {
+            formChanged = false;
+        });
+
+        document.querySelector('a[href="/"]').addEventListener('click', function(e) {
+            if (formChanged) {
+                if (!confirm('У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        document.querySelectorAll('input[name="gender"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const labels = document.querySelectorAll('input[name="gender"]');
+                labels.forEach(r => {
+                    r.closest('label').style.color = '';
+                });
+                if (this.checked) {
+                    this.closest('label').style.color = this.value === 'Муж' ? '#1e3a8a' : '#831843';
+                }
+            });
+        });
+
+        document.querySelectorAll('input[name="gender"]').forEach(radio => {
+            if (radio.checked) {
+                radio.closest('label').style.color = radio.value === 'Муж' ? '#1e3a8a' : '#831843';
+            }
+        });
+    </script>
+</body>
+</html>

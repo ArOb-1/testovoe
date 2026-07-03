@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реестр сотрудников</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .employee-photo {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .employee-photo:hover {
+            transform: scale(3);
+            z-index: 10;
+            position: relative;
+        }
+        .gender-male {
+            background-color: #93c5fd;
+            color: #1e3a8a;
+        }
+        .gender-female {
+            background-color: #f9a8d4;
+            color: #831843;
+        }
+        .page-link.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <h1 class="text-3xl font-bold mb-8">Реестр сотрудников</h1>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <form method="GET" action="/" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Поиск</label>
+                    <input type="text" name="search" value="{{ search or '' }}" 
+                           placeholder="ФИО, телефон..." 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Пол</label>
+                    <select name="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">Все</option>
+                        <option value="Муж" {% if gender == 'Муж' %}selected{% endif %}>Муж</option>
+                        <option value="Жен" {% if gender == 'Жен' %}selected{% endif %}>Жен</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Возраст от</label>
+                    <input type="number" name="age_from" value="{{ age_from or '' }}" min="0" max="100"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Возраст до</label>
+                    <input type="number" name="age_to" value="{{ age_to or '' }}" min="0" max="100"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div class="md:col-span-4 flex gap-2">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Применить
+                    </button>
+                    <a href="/" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                        Сбросить
+                    </a>
+                    <a href="/create" class="ml-auto bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        + Добавить сотрудника
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Таблица -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">№</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Фото</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ФИО</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Возраст</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Телефон</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Пол</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Действие</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for employee in employees %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ employee.id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if employee.photo_path %}
+                            <img src="{{ employee.photo_path }}" alt="Фото" class="employee-photo">
+                            {% else %}
+                            <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                📷
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ employee.last_name }} {{ employee.first_name }} {{ employee.patronymic or '' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ employee.age }} лет
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ employee.phone }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 rounded text-sm {% if employee.gender == 'Муж' %}gender-male{% else %}gender-female{% endif %}">
+                                {{ employee.gender }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/edit/{{ employee.id }}" class="text-blue-600 hover:text-blue-900 mr-3">Ред.</a>
+                            <button onclick="confirmDelete({{ employee.id }})" class="text-red-600 hover:text-red-900">Удал.</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if total_pages > 1 %}
+        <div class="flex justify-center gap-2 mt-6">
+            {% for p in range(1, total_pages + 1) %}
+            <a href="?page={{ p }}{% if search %}&search={{ search }}{% endif %}{% if gender %}&gender={{ gender }}{% endif %}{% if age_from %}&age_from={{ age_from }}{% endif %}{% if age_to %}&age_to={{ age_to }}{% endif %}"
+               class="px-3 py-1 border rounded {% if p == page %}page-link active{% else %}hover:bg-gray-100{% endif %}">
+                {{ p }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function confirmDelete(id) {
+            if (confirm('Вы уверены, что хотите удалить этого сотрудника?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/delete/${id}`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>
