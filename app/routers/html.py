@@ -90,7 +90,7 @@ async def create_employee(
         birth_date_obj = parse_date(birth_date)
         photo_path = await save_photo(photo)
 
-        employee_data = schemas.EmployeeCreate(
+        form_data = schemas.EmployeeCreateForm(
             last_name=last_name.strip(),
             first_name=first_name.strip(),
             patronymic=patronymic.strip() if patronymic else None,
@@ -98,6 +98,7 @@ async def create_employee(
             birth_date=birth_date_obj,
             gender=gender
         )
+        employee_data = form_data.to_employee_create()
 
         crud.create_employee(db, employee_data, photo_path)
 
